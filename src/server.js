@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import express from 'express'
-import { CONNECT_DB, GET_DB } from '~/config/mongodb'
+import exitHook from 'async-exit-hook'
+import { CONNECT_DB, GET_DB, CLOSE_DB } from '~/config/mongodb'
 
 const START_SERVER = () => {
   const app = express()
@@ -14,7 +15,13 @@ const START_SERVER = () => {
   })
 
   app.listen(port, hostname, () => {
-    console.log(`3. Hello, I am running at http://${hostname}:${port}/`)
+    console.log(`3. Hello, I am running at http://${hostname}:${port}`)
+  })
+
+  // thực hiện các tác vụ cleanup trước khi dừng server
+  exitHook(() => {
+    console.log('4.')
+    CLOSE_DB()
   })
 }
 
@@ -29,7 +36,6 @@ const START_SERVER = () => {
   } catch (error) {
     console.error(error)
     process.exit(0)
-
   }
 })()
 
