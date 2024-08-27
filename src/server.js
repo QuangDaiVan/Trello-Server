@@ -18,13 +18,30 @@ const START_SERVER = () => {
   })
 }
 
+// IIFE: Immediately Invoked Function Expression: hàm thực thi ngay sau khi đc định nghĩa
 // chỉ khi kết nối tới Database thành công thì mới start server backend lên
-console.log('1. Connecting to MongoDB Cloud Atlas...')
-CONNECT_DB()
-  .then(() => console.log('2. Connected to MongoDB Cloud Atlas'))
-  .then(() => START_SERVER())
-  .catch(error => {
+(async () => {
+  try {
+    console.log('1. Connecting to MongoDB Cloud Atlas...')
+    await CONNECT_DB()
+    console.log('2. Connected to MongoDB Cloud Atlas')
+    START_SERVER()
+  } catch (error) {
     console.error(error)
     process.exit(0)
-  })
+
+  }
+})()
+
+// // chỉ khi kết nối tới Database thành công thì mới start server backend lên
+// console.log('1. Connecting to MongoDB Cloud Atlas...')
+
+// // viết theo dạng promise
+// CONNECT_DB()
+//   .then(() => console.log('2. Connected to MongoDB Cloud Atlas'))
+//   .then(() => START_SERVER())
+//   .catch(error => {
+//     console.error(error)
+//     process.exit(0)
+//   })
 

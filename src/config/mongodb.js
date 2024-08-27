@@ -1,5 +1,5 @@
 const MONGODB_URI = 'mongodb+srv://quangdv2802:13yEyvXEnKh7jqyy@cluster-quangdaivan.s2nax.mongodb.net/?retryWrites=true&w=majority&appName=Cluster-QuangDaiVan'
-const DATABASE_NAME = 'trello-quangdv-MERN-stackpro'
+const DATABASE_NAME = 'trello-quangdv-MERN-stack-pro'
 
 
 import { MongoClient, ServerApiVersion } from 'mongodb'
