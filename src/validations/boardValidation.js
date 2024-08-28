@@ -29,7 +29,6 @@ const createNew = async (req, res, next) => {
     next()
 
   } catch (error) {
-    // const errorMessage = new Error(error).message
     // console.log(error.message)
     // const errorMessage = new Error(error).message
     // const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage)
