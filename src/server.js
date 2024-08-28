@@ -35,6 +35,8 @@ const START_SERVER = () => {
     console.log('1. Connecting to MongoDB Cloud Atlas...')
     await CONNECT_DB()
     console.log('2. Connected to MongoDB Cloud Atlas')
+
+    // khởi động server back-end sau khi đã connect database thành công
     START_SERVER()
   } catch (error) {
     console.error(error)
