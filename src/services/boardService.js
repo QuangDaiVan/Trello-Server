@@ -1,4 +1,6 @@
+import { StatusCodes } from 'http-status-codes'
 import { boardModel } from '~/models/boardModel'
+import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formatters'
 
 const createNew = async (reqBody) => {
@@ -7,8 +9,7 @@ const createNew = async (reqBody) => {
     // xư lý logic dữ liệu tùy đặc thù dự án
     const newBoard = {
       ...reqBody,
-      slug: slugify(reqBody.title),
-      columnOrderIds: ['test']
+      slug: slugify(reqBody.title)
     }
 
     // Gọi tới tầng Model để xử lý lưu bản ghi newBoard vào trong Database
@@ -27,4 +28,18 @@ const createNew = async (reqBody) => {
   } catch (error) { throw error }
 }
 
-export const boardService = { createNew }
+const getDetails = async (boardId) => {
+  // eslint-disable-next-line no-useless-catch
+  try {
+    // Gọi tới tầng Model để xử lý lưu bản ghi newBoard vào trong Database
+    const board = await boardModel.getDetails(boardId)
+
+    if (!board) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found!')
+    }
+    // Phải có return để trả kết quả về
+    return board
+  } catch (error) { throw error }
+}
+
+export const boardService = { createNew, getDetails }
