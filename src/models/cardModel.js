@@ -27,11 +27,19 @@ const createNew = async (data) => {
   try {
     const validData = await validateBeforeCreate(data)
 
+    // biến đổi 1 số dữ liệu liên quan tới ObjectId chuẩn chỉnh
+    const newCardToAdd = {
+      ...validData,
+      boardId: new ObjectId(validData.boardId),
+      columnId: new ObjectId(validData.columnId)
+    }
+
+
     // lấy data đã kiểm tra từ DB
-    const createdBoard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(validData)
+    const createdCard = await GET_DB().collection(CARD_COLLECTION_NAME).insertOne(newCardToAdd)
 
     // trả data về
-    return createdBoard
+    return createdCard
   } catch (error) {
 
     // bắt lỗi

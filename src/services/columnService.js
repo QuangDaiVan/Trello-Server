@@ -1,4 +1,5 @@
 import { columnModel } from '~/models/columnModel'
+import { boardModel } from '~/models/boardModel'
 import { slugify } from '~/utils/formatters'
 
 const createNew = async (reqBody) => {
@@ -12,9 +13,15 @@ const createNew = async (reqBody) => {
     const getNewColumn = await columnModel.findOneById(createdColumn.insertedId)
 
     // Xử lý ...
+    if (getNewColumn) {
+      // xử lý cấu trúc data ở đây trước khi trả dữ liệu về
+      getNewColumn.cards = []
+
+      // cập nhật mảng columnOrderIds trong collection boards
+      await boardModel.pushColumnOrderIds(getNewColumn)
+    }
     return getNewColumn
   } catch (error) { throw error }
 }
-
 
 export const columnService = { createNew }
