@@ -80,6 +80,12 @@ const update = async (columnId, updateData) => {
         delete updateData[fieldName]
       }
     })
+
+    // đối với những dữ liệu liên quan đến ObjectId, biến đổi ở đây (có thể tách thành function riêng sau)
+    if (updateData.cardOrderIds) {
+      updateData.cardOrderIds = updateData.cardOrderIds.map(_id => (new ObjectId(_id)))
+    }
+
     const result = await GET_DB().collection(COLUMN_COLLECTION_NAME).findOneAndUpdate(
       { _id: new ObjectId(columnId) },
       { $set: updateData },
