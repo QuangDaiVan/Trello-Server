@@ -1,5 +1,6 @@
-import { columnModel } from '~/models/columnModel'
 import { boardModel } from '~/models/boardModel'
+import { columnModel } from '~/models/columnModel'
+import { cardModel } from '~/models/cardModel'
 import { slugify } from '~/utils/formatters'
 
 const createNew = async (reqBody) => {
@@ -36,5 +37,16 @@ const update = async (columnId, reqBody) => {
   } catch (error) { throw error }
 }
 
+const deleteItem = async (columnId) => {
+  try {
+    // xóa column
+    await columnModel.deleteOneById(columnId)
+    // xóa toàn bộ card thuộc column trên
+    await cardModel.deleteManyByColumnId(columnId)
 
-export const columnService = { createNew, update }
+    return { deleteResult: 'Column and its Cards deleted successfully' }
+  } catch (error) { throw error }
+}
+
+
+export const columnService = { createNew, update, deleteItem }
