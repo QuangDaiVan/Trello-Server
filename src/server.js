@@ -26,12 +26,12 @@ const START_SERVER = () => {
   // môi trường production (đang deploy bằng render)
   if (env.BUILD_MODE === 'production') {
     app.listen(process.env.PORT, () => {
-      console.log(`3. Production: Hello ${env.AUTHOR}, Back-end server is running successfully at Port ${process.env.PORT}`)
+      console.log(`3. Production: Hello ${env.AUTHOR}, Back-end server is running successfully at Port ${env.PORT}`)
     })
   } else {
     // môi tường local dev
-    app.listen(env.LOCAL_DEV_APP_PORT, env.LOCAL_DEV_APP_HOST, () => {
-      console.log(`3. Local DEV: Hello ${env.AUTHOR}, Back-end server is running successfully at Host: ${env.LOCAL_DEV_APP_HOST} and Port: ${env.LOCAL_DEV_APP_PORT}`)
+    app.listen(env.APP_PORT, env.APP_HOST, () => {
+      console.log(`3. Local DEV: Hello ${env.AUTHOR}, Back-end server is running successfully at Host: ${env.APP_HOST} and Port: ${env.APP_PORT}`)
     })
   }
 

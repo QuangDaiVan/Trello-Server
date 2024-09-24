@@ -9,6 +9,8 @@ export const env = {
 
   AUTHOR: process.env.AUTHOR,
 
+  JWT_SCRETE: process.env.JWT_SCRETE,
+
   BUILD_MODE: process.env.BUILD_MODE
 }
 
