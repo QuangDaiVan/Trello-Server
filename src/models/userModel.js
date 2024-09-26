@@ -1,6 +1,8 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
 import bcrypt from 'bcryptjs'
+import { ObjectId } from 'mongodb'
+
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -34,11 +36,25 @@ const createNew = async (data) => {
 
 const findByEmail = async (email) => {
   try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ email })
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({ email: email })
     return result
   } catch (error) {
     throw new Error(error)
   }
 }
 
-export const userModel = { USER_COLLECTION_NAME, USER_COLLECTION_SCHEMA, createNew, findByEmail }
+const findOneById = async (id) => {
+  try {
+    // console.log(id)
+    // console.log(new ObjectId(id))
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({
+      _id: new ObjectId(id)
+    })
+    return result
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+
+export const userModel = { USER_COLLECTION_NAME, USER_COLLECTION_SCHEMA, createNew, findByEmail, findOneById }
