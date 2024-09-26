@@ -1,5 +1,4 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import bcrypt from 'bcryptjs'
 
@@ -12,6 +11,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false)
 })
+
 
 const validateBeforeCreate = async (data) => {
   return await USER_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })

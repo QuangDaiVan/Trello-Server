@@ -35,8 +35,9 @@ const createNew = async (data) => {
     const validData = await validateBeforeCreate(data)
     // console.log('validData: ', validData)
 
+    const newBoard = { ...validData }
     // lấy data đã kiểm tra từ DB
-    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(validData)
+    const createdBoard = await GET_DB().collection(BOARD_COLLECTION_NAME).insertOne(newBoard)
 
     // trả data về
     return createdBoard
