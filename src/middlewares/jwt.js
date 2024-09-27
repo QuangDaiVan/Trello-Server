@@ -1,12 +1,11 @@
-// const jwt = require('jsonwebtoken')
 import jwt from 'jsonwebtoken'
+import { env } from '~/config/environment'
 
-const generateAccsessToken = (uid, role) => {
-  return jwt.sign({ _id: uid, role }, process.env.JWT_SECRET, { expiresIn: '2d' })
+export const generateAccsessToken = (uid) => {
+  return jwt.sign({ _id: uid }, env.JWT_SECRET, { expiresIn: '2d' })
 }
 
-const generateRefreshToken = (uid) => {
-  return jwt.sign({ _id: uid }, process.env.JWT_SECRET, { expiresIn: '7d' })
+export const generateRefreshToken = (uid) => {
+  return jwt.sign({ _id: uid }, env.JWT_SECRET, { expiresIn: '7d' })
 }
 
-module.exports = { generateAccsessToken, generateRefreshToken }
