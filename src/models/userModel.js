@@ -6,7 +6,7 @@ import bcrypt from 'bcryptjs'
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
   username: Joi.string().required().min(3).max(50).trim().strict(),
-  email: Joi.string().email().required().trim().lowercase(),
+  email: Joi.string().email().required().trim(),
   password: Joi.string().required().min(8).max(100),
   createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
