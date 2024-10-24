@@ -9,8 +9,12 @@ export const env = {
 
   AUTHOR: process.env.AUTHOR,
 
-  JWT_SCRETE: process.env.JWT_SCRETE,
+  JWT_SECRET: process.env.JWT_SECRET,
 
-  BUILD_MODE: process.env.BUILD_MODE
+  BUILD_MODE: process.env.BUILD_MODE,
+  EMAIL_NAME: process.env.EMAIL_NAME,
+  EMAIL_APP_PASSWORD: process.env.EMAIL_APP_PASSWORD,
+  URL_SERVER: process.env.URL_SERVER
+
 }
 

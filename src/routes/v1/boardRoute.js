@@ -2,11 +2,11 @@ import express from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { boardValidation } from '~/validations/boardValidation'
 import { boardController } from '~/controllers/boardController'
-import { verifyToken } from '~/middlewares/authMiddleware'
+// import { verifyToken } from '~/middlewares/authMiddleware'
 
 const Router = express.Router()
 
-Router.use(verifyToken)
+// Router.use(verifyToken)
 
 Router.route('/')
   .get((req, res) => {
