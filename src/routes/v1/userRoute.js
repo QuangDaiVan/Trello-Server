@@ -1,16 +1,32 @@
 import express from 'express'
-import { userController } from '~/controllers/userController'
 import { userValidation } from '~/validations/userValidation'
-import { verifyAccessToken } from '~/middlewares/verifyToken'
+import { userController } from '~/controllers/userController'
+import { authMiddleware } from '~/middlewares/authMiddleware'
+import { multerUploadMiddleware } from '~/middlewares/multerUploadMiddleware'
 
 const Router = express.Router()
 
-Router.post('/register', userValidation.createNew, userController.register)
-Router.post('/login', userValidation.login, userController.login)
-Router.get('/logout', userController.logout)
-Router.get('/forgotPassword', userController.forgotPassword)
-Router.get('/current', [verifyAccessToken], userController.getCurrent)
-Router.put('/resetPassword', userController.resetPassword)
-Router.put('/update', [verifyAccessToken], userController.updateUser)
+Router.route('/register')
+  .post(userValidation.createNew, userController.createNew)
+
+Router.route('/verify')
+  .put(userValidation.verifyAccount, userController.verifyAccount)
+
+Router.route('/login')
+  .post(userValidation.login, userController.login)
+
+Router.route('/logout')
+  .delete(userController.logout)
+
+Router.route('/refresh_token')
+  .get(userController.refreshToken)
+
+Router.route('/update')
+  .put(
+    authMiddleware.isAuthorized,
+    multerUploadMiddleware.upload.single('avatar'),
+    userValidation.update,
+    userController.update
+  )
 
 export const userRoute = Router

@@ -1,92 +1,91 @@
 import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
+import ms from 'ms'
+import ApiError from '~/utils/ApiError'
 
-const register = async (req, res, next) => {
+const createNew = async (req, res, next) => {
   try {
-    const result = await userService.register(req.body)
-    res.status(StatusCodes.CREATED).json(result)
+    const createdUser = await userService.createNew(req.body)
+    res.status(StatusCodes.CREATED).json(createdUser)
+  } catch (error) { next(error) }
+}
+
+const verifyAccount = async (req, res, next) => {
+  try {
+    const result = await userService.verifyAccount(req.body)
+    res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error) }
 }
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body
-    const result = await userService.login(email, password)
-    const { refreshToken, ...data } = result
-    res.cookie('refreshToken', result.refreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
-    res.status(StatusCodes.OK).json(data)
+    const result = await userService.login(req.body)
+
+    /**
+     * Xử lý trả về http only cookie cho phía trình duyệt
+     * Về cái maxAge và thư viện ms: https://expressjs.com/en/api.html
+     * Đối với cái maxAge - thời gian sống của Cookie thì chúng ta sẽ để tối đa 14 ngày, tùy dự án. Lưu ý thời gian sống của cookie khác với cái thời gian sống của token nhé. Đừng bị nhầm lẫn :D
+     */
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
+    })
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
+    })
+
+    res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error) }
 }
 
 const logout = async (req, res, next) => {
   try {
-    const cookie = req.cookies
-    await userService.logout(cookie.refreshToken)
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true })
-    res.status(StatusCodes.OK).json('Logout is done')
+    // Xóa cookie - đơn giản là làm ngược lại so với việc gán cookie ở hàm login
+    res.clearCookie('accessToken')
+    res.clearCookie('refreshToken')
+
+    res.status(StatusCodes.OK).json({ loggedOut: true })
   } catch (error) { next(error) }
 }
 
-const getCurrent = async (req, res, next) => {
+const refreshToken = async (req, res, next) => {
   try {
-    const user = await userService.getCurrent(req.user._id)
-    res.status(StatusCodes.OK).json({
-      success: true,
-      result: user
+    const result = await userService.refreshToken(req.cookies?.refreshToken)
+
+    // Trả về một cái cookie accessToken mới sau khi đã refresh thành công
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: ms('14 days')
     })
+
+    res.status(StatusCodes.OK).json(result)
   } catch (error) {
-    next(error)
+    next(new ApiError(StatusCodes.FORBIDDEN, 'Please Sign In! (Error from refresh Token)'))
   }
 }
 
-const forgotPassword = async (req, res, next) => {
+const update = async (req, res, next) => {
   try {
-    const { email } = req.query
-    const user = await userService.forgotPassword(email)
-    res.status(StatusCodes.OK).json({
-      success: true,
-      result: user
-    })
-  } catch (error) {
-    next(error)
-  }
-
-}
-
-const resetPassword = async (req, res, next) => {
-  try {
-    const { password, token } = req.body
-    if (!password || !token) { throw new Error('Missing inputs') }
-    const user = await userService.resetPassword(password, token)
-    res.status(StatusCodes.OK).json({
-      success: true,
-      result: user
-    })
-  } catch (error) {
-    next(error)
-  }
-}
-
-const updateUser = async (req, res, next) => {
-  try {
-    const { _id } = req.user
-    if (!_id || Object.keys(req.body).length === 0) { throw new Error('Missing inputs') }
-    const response = await userService.updateUser(_id, req.body)
-    return res.status(200).json({
-      success: response ? true : false,
-      result: response ? response : 'Something went wrong'
-    })
-  } catch (error) {
-    next(error)
-  }
+    const userId = req.jwtDecoded._id
+    const userAvatarFile = req.file
+    // console.log('Controller > userAvatarFile: ', userAvatarFile)
+    const updatedUser = await userService.update(userId, req.body, userAvatarFile)
+    res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) { next(error) }
 }
 
 export const userController = {
-  register,
+  createNew,
+  verifyAccount,
   login,
   logout,
-  getCurrent,
-  forgotPassword,
-  resetPassword,
-  updateUser
+  refreshToken,
+  update
 }
