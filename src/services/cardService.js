@@ -1,20 +1,18 @@
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
-import { slugify } from '~/utils/formatters'
+import { CloudinaryProvider } from '~/providers/CloudinaryProvider'
 
 const createNew = async (reqBody) => {
   try {
-    // xủ lý logic dữ liệu tùy đặc thù dự án
+    // Xử lý logic dữ liệu tùy đặc thù dự án
     const newCard = {
-      ...reqBody,
-      slug: slugify(reqBody.title)
+      ...reqBody
     }
     const createdCard = await cardModel.createNew(newCard)
     const getNewCard = await cardModel.findOneById(createdCard.insertedId)
 
-    // Xử lý ...
     if (getNewCard) {
-      // cập nhật mảng cardOrderIds trong collection columns
+      // Cập nhật mảng cardOrderIds trong collection columns
       await columnModel.pushCardOrderIds(getNewCard)
     }
 
@@ -22,4 +20,41 @@ const createNew = async (reqBody) => {
   } catch (error) { throw error }
 }
 
-export const cardService = { createNew }
+const update = async (cardId, reqBody, cardCoverFile, userInfo) => {
+  try {
+    const updateData = {
+      ...reqBody,
+      updatedAt: Date.now()
+    }
+
+    let updatedCard = {}
+
+    if (cardCoverFile) {
+      const uploadResult = await CloudinaryProvider.streamUpload(cardCoverFile.buffer, 'card-covers')
+      updatedCard = await cardModel.update(cardId, { cover: uploadResult.secure_url })
+    } else if (updateData.commentToAdd) {
+      // Tạo dữ liệu comment để thêm vào Database, cần bổ sung thêm những field cần thiết
+      const commentData = {
+        ...updateData.commentToAdd,
+        commentedAt: Date.now(),
+        userId: userInfo._id,
+        userEmail: userInfo.email
+      }
+      updatedCard = await cardModel.unshiftNewComment(cardId, commentData)
+    } else if (updateData.incomingMemberInfo) {
+      // Trường hợp ADD hoặc REMOVE thành viên ra khỏi Card
+      updatedCard = await cardModel.updateMembers(cardId, updateData.incomingMemberInfo)
+    } else {
+      // Các trường hợp update chung như title, description
+      updatedCard = await cardModel.update(cardId, updateData)
+    }
+
+
+    return updatedCard
+  } catch (error) { throw error }
+}
+
+export const cardService = {
+  createNew,
+  update
+}
