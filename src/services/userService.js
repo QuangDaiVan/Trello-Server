@@ -33,7 +33,6 @@ const createNew = async (reqBody) => {
     const createdUser = await userModel.createNew(newUser)
     const getNewUser = await userModel.findOneById(createdUser.insertedId)
 
-    // Gửi email cho người dùng xác thực tài khoản (buổi sau...)
     const verificationLink = `${WEBSITE_DOMAIN}/account/verification?email=${getNewUser.email}&token=${getNewUser.verifyToken}`
     const customSubject = 'Trello MERN Stack Advanced: Please verify your email before using our services!'
     const htmlContent = `
